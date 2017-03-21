@@ -8,7 +8,7 @@
 @ fxpneg: to let a 32.32 fixed-point decimal become its opposite;
 @ r0: fraction part, r1: integral part
 fxpneg:
-neg64_macro r0, r1, r2
+neg64_macro_thumb r0, r1, r2
 bx lr
 
 .global fxpadd
@@ -95,7 +95,7 @@ movpl r5, #1
 movmi r5, #0
 mov r9, r2
 mov r10, r3
-neg64_macro_arm r9, r10, r5
+neg64_macro_cond r9, r10, r5
 push {r4}
 sbfx r4, r1, #31, #1
 mov r5, #64
@@ -134,7 +134,7 @@ mov r1, QUOT1
 ldr r2, [sp], #4
 cmp r2, #0
 movpl r2, #0
-neg64_macro_arm r0, r1, r2
+neg64_macro_cond r0, r1, r2
 pop {r4 - r10, pc}
 fxpdiv_signed_break:
 orr QUOT0, QUOT0, #1
@@ -166,7 +166,7 @@ popeq {r4 - r9, pc}
 #define QUOT1 r9
 mov RGSTR, #0
 mov CNTRL, #64
-neg64_macro r2, r3, 32
+neg64_macro_arm r2, r3
 mov QUOT0, #0
 mov QUOT1, #0
 fxpdiv_unsigned_loop:

@@ -26,9 +26,27 @@ uint64_t (*operp[])(uint32_t, uint32_t, uint32_t, uint32_t) = {
 };
 void printfxp(FILE *fp, uni64_u u);
 
+const char usage[] = 
+"\nUSAGE: <fxp1> <op> <fxp2>\n\n"
+"Both '<fxp1>' and '<fxp2>' should be fixed point decimals, "
+"e.g. '1.29', '-7.2', etc. \n"
+"A reasonable omitting is acceptable, such like '19', '20.', or '.5'.\n\n"
+"The '<op>' in the top usage illustration could be:\n"
+"\t'+' to indicate addition,\n"
+"\t'-' to indicate subtraction,\n"
+"\t'*' to indicate singed multiplication,\n"
+"\t'&' to indicate unsigned multiplication,\n"
+"\t'/' to indicate signed division,\n"
+"\t'\\' to indicate unsigned division.\n"
+"\n"
+"Note this program is just for testing our shared library, \n"
+"and the 'presentation layer' (scanning and printing 32.32 fixed point decimals)"
+" is implemented in a way simple but harmful to accuracy.\n"
+"So the output results DO NOT represent the precision ability of our library.\n";
+
 static char *scan_sign(char *restrict str, int *restrict is_neg)
 {
-    while (!isdigit(*str) && *str)
+    while (!isdigit(*str) && *str != '.' && *str)
         if (*str++ == '-')
             *is_neg = !*is_neg;
     return str;
@@ -159,12 +177,51 @@ void printfxp(FILE *fp, uni64_u u)
         fprintf(fp, ".%0"MACROQUOT(FP_PRINTLEN)"u", rconvfpofxp(u.u32[0]));
 }
 
-int main(void)
+#if 0
+uni64_u pi_item(int i)
+{
+    uni64_u rnt = {.u32 = {0, 8}}, a = {.u32[0] = 0};
+
+    a.u32[1] = 2 * i - 1;
+    rnt.u64 = fxpdiv_signed(rnt.u32[0], rnt.u32[1], a.u32[0], a.u32[1]);
+    if (!(i & 1))
+        rnt.u64 = fxpneg(rnt.u32[0], rnt.u32[1]);
+    return rnt;
+}
+#endif
+
+int main(int argc, char *argv[])
 {
     uni64_u u;
+    //uni64_u pi = {.u64 = 0}, ite;
     int r;
     char prompt[] = "expression: ";
 
+#if 0
+#define CHECKFXP(x) (printf("%#x %#x\n", x.u32[0], x.u32[1]))
+    for (int i = 1; ite = pi_item(i), ite.u64 != 0; i++) {
+#if 0
+        printfxp(stdout, ite);
+        putchar('\n');
+        CHECKFXP(ite);
+#endif
+        pi.u64 = fxpadd(pi.u32[0], pi.u32[1], ite.u32[0], ite.u32[1]);
+    }
+    ite.u32[1] = 0;
+    if (pi.u32[0] & 1U)
+        ite.u32[0] = 1;
+    else
+        ite.u32[0] = 0;
+    pi.u32[0] >>= 1;
+    if (pi.u32[1] & 1U)
+        pi.u32[0] += (uint32_t)INT32_MIN;
+    pi.u32[1] >>= 1;
+    pi.u64 = fxpadd(pi.u32[0], pi.u32[1], ite.u32[0], ite.u32[1]);
+    fputs("pi = ", stdout);
+    printfxp(stdout, pi);
+    putchar('\n');
+#endif
+    puts(usage);
     while (fputs(prompt, stdout), (r = scanfxp(stdin, &u)) != EOF)
         if (r) 
             fflush(stdin);
