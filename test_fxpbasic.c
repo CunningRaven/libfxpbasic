@@ -44,6 +44,14 @@ const char usage[] =
 " is implemented in a way simple but harmful to accuracy.\n"
 "So the output results DO NOT represent the precision ability of our library.\n";
 
+static uint64_t (*parse_prefix(char *restrict str))(uint32_t, uint32_t)
+{
+    if (!strncmp(str, "sin", 3))
+        return fxpsin;
+    else
+        return NULL;
+}
+
 static char *scan_sign(char *restrict str, int *restrict is_neg)
 {
     while (!isdigit(*str) && *str != '.' && *str)
@@ -92,7 +100,9 @@ static uint64_t str2fxp(char *str)
     int is_neg = 0;
     char *fp, *ip;
     uni64_u u;
+    uint64_t (*me)(uint32_t, uint32_t);
 
+    me = parse_prefix(str);
     ip = scan_sign(str, &is_neg);
     u.u32[1] = strtoul(ip, NULL, 10);
     if ((fp = find_dot(ip)) == NULL)
@@ -103,6 +113,8 @@ static uint64_t str2fxp(char *str)
     }
     if (is_neg)
         u.u64 = fxpneg(u.u32[0], u.u32[1]);
+    if (me)
+        u.u64 = me(u.u32[0], u.u32[1]);
     return u.u64;
 }
 

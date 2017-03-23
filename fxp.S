@@ -4,30 +4,39 @@
 .align 2
 
 .global fxpneg
+.global cfxpneg
 .type fxpneg, %function
+.type cfxpneg, %function
 @ fxpneg: to let a 32.32 fixed-point decimal become its opposite;
 @ r0: fraction part, r1: integral part
 fxpneg:
+cfxpneg:
 neg64_macro_thumb r0, r1, r2
 bx lr
 
 .global fxpadd
+.global cfxpadd
 .type fxpadd, %function
+.type cfxpadd, %function
 @ fxpadd: addiction of two 32.32 fixed-point decimals
 @ r0: fractional part of 1st addend, r1: integral part of 1st addend,
 @ r2: FP of 2nd, r3: IP of 2nd
 fxpadd:
+cfxpadd:
 cmn r0, r2
 adc r1, r1, r3
 add r0, r0, r2
 bx lr
 
 .global fxpsub
+.global cfxpsub
 .type fxpsub, %function
+.type cfxpsub, %function
 @ fxpsub: subtraction of two 32.32 fixed-point decimals
 @ r0: fractional part of minuend, r1: integral part of minuend,
 @ r2: FP of subtrahend, r3: IP of subtrahend
 fxpsub:
+cfxpsub:
 cmp r0, r2
 sbc r1, r1, r3
 sub r0, r2
@@ -42,11 +51,14 @@ umlal \rh, \trashbin, \mcndh, \mtorh
 .endm
 
 .global fxpmul_unsigned
+.global cfxpmul_unsigned
 .type fxpmul_unsigned, %function
+.type cfxpmul_unsigned, %function
 @ fxpmul_unsigned: unsigned multiplication of two 32.32 fixed-point decimals
 @ r0: fractional part of multiplicand, r1: integral part of multiplicand,
 @ r2: FP of multiplicator, r3: IP of multiplicator
 fxpmul_unsigned:
+cfxpmul_unsigned:
 push {r4 , r5}
 fxpmul_unsigned_macro r4, r5, r0, r1, r2, r3, r12
 mov r0, r4
@@ -67,11 +79,14 @@ add \obj, \obj, \srcl
 .endm
 
 .global fxpmul_signed
+.global cfxpmul_signed
 .type fxpmul_signed, %function
+.type cfxpmul_signed, %function
 @ fxpmul_signed: signed multiplication of two 32.32 fixed-point decimals
 @ r0: fractional part of multiplicand, r1: integral part of multiplicand,
 @ r2: FP of multiplicator, r3: IP of multiplicator
 fxpmul_signed:
+cfxpmul_signed:
 push {r4, r5}
 fxpmul_unsigned_macro r12, r5, r0, r1, r2, r3, r4
 fxpmul_checksign r5, r0, r3, r4
@@ -85,8 +100,11 @@ bx lr
 .align 4
 
 .global fxpdiv_signed
+.global cfxpdiv_signed
 .type fxpdiv_signed, %function
+.type cfxpdiv_signed, %function
 fxpdiv_signed:
+cfxpdiv_signed:
 push {r4 - r10, lr}
 orrs r4, r2, r3
 popeq {r4 - r10, pc}
@@ -150,11 +168,14 @@ bl fxpdiv_signed_out
 #undef DVSR1
 
 .global fxpdiv_unsigned
+.global cfxpdiv_unsigned
 .type fxpdiv_unsigned, %function
+.type cfxpdiv_unsigned, %function
 @ fxpdiv_unsigned: division of two 32.32 fixed point decimals
 @ r0: fractional part of dividend, r1: integral part of dividend,
 @ r2: FP of divisor, r3: IP of divisor
 fxpdiv_unsigned:
+cfxpdiv_unsigned:
 push {r4 - r9, lr}
 orrs r4, r2, r3
 popeq {r4 - r9, pc}

@@ -15,3 +15,8 @@ libfxpbasic: Implement a basic 32.32 fixed point toolkit using C and assembly on
     fxpexp: returns the value of e raised to the power of its argument.
     fxpln: returns the natural logarithm of its argument.
 2. test_fxpbasic: a simple calculator to test our shared object.
+
+To generate the lib:
+    make
+To generate the calculator for testing:
+    make calculator.debug
